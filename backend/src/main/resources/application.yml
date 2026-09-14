@@ -1,0 +1,83 @@
+server:
+  port: 8080
+  shutdown: graceful
+  forward-headers-strategy: framework
+  error:
+    include-message: never
+
+spring:
+  application:
+    name: libertyreckoner-api
+  datasource:
+    url: ${SPRING_DATASOURCE_URL:jdbc:postgresql://localhost:5432/libertyreckoner}
+    username: ${SPRING_DATASOURCE_USERNAME:libertyreckoner}
+    password: ${SPRING_DATASOURCE_PASSWORD:libertyreckoner-local-password}
+    hikari:
+      maximum-pool-size: 15
+      minimum-idle: 2
+      connection-timeout: 20000
+  jpa:
+    open-in-view: false
+    hibernate:
+      ddl-auto: validate
+    properties:
+      hibernate:
+        default_batch_fetch_size: 50
+        jdbc:
+          time_zone: UTC
+        format_sql: false
+  flyway:
+    enabled: true
+  jackson:
+    default-property-inclusion: non_null
+    time-zone: UTC
+  task:
+    scheduling:
+      pool:
+        size: 2
+  mail:
+    host: ${SMTP_HOST:localhost}
+    port: ${SMTP_PORT:1025}
+    username: ${SMTP_USERNAME:}
+    password: ${SMTP_PASSWORD:}
+    properties:
+      mail.smtp.auth: ${SMTP_AUTH:false}
+      mail.smtp.starttls.enable: ${SMTP_STARTTLS:false}
+
+management:
+  health:
+    mail:
+      enabled: ${LIBERTY_RECKONER_MAIL_HEALTH_ENABLED:false}
+  endpoints:
+    web:
+      exposure:
+        include: health,info,prometheus
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: never
+  metrics:
+    tags:
+      application: libertyreckoner-api
+
+libertyreckoner:
+  jwt:
+    secret: ${LIBERTY_RECKONER_JWT_SECRET:local-development-secret-change-before-production-123456}
+    expiration-minutes: ${LIBERTY_RECKONER_JWT_EXPIRATION_MINUTES:480}
+    secure-cookie: ${LIBERTY_RECKONER_SECURE_COOKIE:false}
+  seed-demo-data: ${LIBERTY_RECKONER_SEED_DEMO_DATA:true}
+  cors-allowed-origins: ${LIBERTY_RECKONER_CORS_ALLOWED_ORIGINS:http://localhost:5173,http://localhost:8088}
+  eligibility:
+    refresh-cron: ${LIBERTY_RECKONER_REFRESH_CRON:0 15 2 * * *}
+    refresh-zone: ${LIBERTY_RECKONER_REFRESH_ZONE:Asia/Kolkata}
+  notifications:
+    dispatch-enabled: ${LIBERTY_RECKONER_NOTIFICATIONS_ENABLED:true}
+    transport: ${LIBERTY_RECKONER_NOTIFICATION_TRANSPORT:log}
+    poll-interval-ms: ${LIBERTY_RECKONER_NOTIFICATION_POLL_MS:10000}
+    batch-size: ${LIBERTY_RECKONER_NOTIFICATION_BATCH_SIZE:25}
+    max-attempts: ${LIBERTY_RECKONER_NOTIFICATION_MAX_ATTEMPTS:5}
+    from-address: ${LIBERTY_RECKONER_NOTIFICATION_FROM:no-reply@libertyreckoner.gov.in}
+    superintendent-address: ${LIBERTY_RECKONER_SUPERINTENDENT_EMAIL:superintendent@libertyreckoner.gov.in}
+    dlsa-address: ${LIBERTY_RECKONER_DLSA_EMAIL:dlsa@libertyreckoner.gov.in}
+    court-address: ${LIBERTY_RECKONER_COURT_EMAIL:registry@libertyreckoner.gov.in}
